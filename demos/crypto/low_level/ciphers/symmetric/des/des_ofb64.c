@@ -1,0 +1,100 @@
+#include <stdio.h>
+#include <string.h>
+#include <openssl/des.h>
+#include <openssl/bio.h>
+
+
+
+int main(void)
+{
+    int         i;
+    BIO*        bio_out;
+
+    DES_cblock          key;
+    DES_key_schedule    schedule;
+
+    unsigned char const iv_data[DES_KEY_SZ] = {
+        0xcc, 0xfe, 0xcd, 0x3e, 0x21, 0xde, 0x1c, 0x31
+    };
+
+    unsigned char       iv[DES_KEY_SZ]; 
+
+    char*   data    = "The worthwhile problems are the ones you can"
+                      "really solve or help solve, the ones you can"
+                      "really contribute something to. No "
+                      "problem is too small or too trivial if we "
+                      "can really do something about it."
+                      "- Richard Feynman";
+
+    int     length  = strlen(data);
+
+    /* Intialise to '0' to indicate that '0' bytes of the IV has been used */
+    int     num     = 0;
+
+    /* Allocate the memory for the resulting ciphertext and plaintext */
+    char*	ciphertext  = (char*) malloc(sizeof(char) * length); 
+    char*	plaintext   = (char*) malloc(sizeof(char) * length); 
+
+    /* Copy the IV data to the IV array. The IV array will be updated by the DES_ofb_encrypt call.*/
+    memcpy(iv, iv_data, DES_KEY_SZ);
+
+    /* In this example, we shall be generating a random key. Before this can
+     * happen, we must seed the PRNG. OpenSSL ensures that the PRNG is transparently 
+     * seeded on systems that provide the "/dev/urandom" file. 
+     */
+
+    /* Cater for seeding the PRNG in Windows */
+#ifdef OPENSSL_SYS_WIN32
+    /* Add entropy */
+#endif
+
+    /* Generate the random key (as expected by DES) */
+    DES_random_key(&key);
+
+    /* Check the odd parity of the key and its weakness. In doing so, 
+     * convert to the architecture dependent format.  
+     */
+    DES_set_key_checked(&key, &schedule);
+
+    DES_ofb64_encrypt(data, ciphertext, length, &schedule, (DES_cblock*)iv, &num);
+
+    bio_out = BIO_new_fp(stdout, BIO_NOCLOSE);
+
+    BIO_printf(bio_out, "Original plaintext: %s\n\n", data);
+
+    BIO_printf(bio_out, "Ciphertext: ");
+
+    /* print out the ciphertext */
+    for (i = 0; i < length; i++)
+        BIO_printf(bio_out, "%02x", ((unsigned char*)ciphertext)[i]);
+
+    BIO_printf(bio_out, "\n\n");
+
+    /* Start the decryption process */
+
+    /* Re-intialise to '0' to indicate that '0' bytes of the IV has been used */
+    num = 0;
+
+    /* First, copy the original IV data back to the IV array - as it was 
+     * overwritten during the encryption process 
+     */
+    memcpy(iv, iv_data, DES_KEY_SZ);
+
+    DES_ofb64_encrypt(ciphertext, plaintext, length, &schedule, (DES_cblock*)iv, &num);
+
+    BIO_printf(bio_out, "Recovered plaintext: ");
+
+    /* print out the plaintext */
+    for (i = 0; i < length; i++)
+        BIO_printf(bio_out, "%c", ((unsigned char*)plaintext)[i]);
+
+    BIO_printf(bio_out, "\n");
+
+    BIO_free(bio_out);
+
+    free(ciphertext);
+    free(plaintext);
+
+    return 0;
+
+}
