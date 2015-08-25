@@ -3,7 +3,7 @@
 #include <openssl/err.h>
 
 
-#define PRIME_LENGTH    1024
+#define PRIME_LENGTH    2048
 
 int main(void)
 {
