@@ -152,8 +152,6 @@ int main(void)
     /* Set-up the public key */
     set_public_key(&public_key);
 
-    RSA_public_encrypt(data_length, data, 
-
 
     
 
