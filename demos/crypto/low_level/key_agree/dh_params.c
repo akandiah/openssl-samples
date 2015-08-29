@@ -84,6 +84,8 @@ int main(void)
     BN_print_fp(stdout, dh_store->pub_key);
     printf("\n\n");
 
+    // Free the DH structure.
+    DH_free(dh_store);
 
     return 0;
 }

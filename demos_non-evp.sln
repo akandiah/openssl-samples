@@ -17,9 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "digests", "digests", "{8B50DD55-F9DC-48FA-80C8-032F391A51E1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{15F8B803-92FB-457D-84B6-4632F3A6931B}"
-	ProjectSection(SolutionItems) = preProject
-		demos_low.txt = demos_low.txt
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "blowfish", "blowfish", "{16AF18B3-594E-473E-A8EE-F39D4363982E}"
 EndProject
